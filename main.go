@@ -16,6 +16,9 @@ func main() {
 	if err := gen.Unmarshal(data); err != nil {
 		Error(err, "error unmarshaling request")
 	}
+	if err := gen.Generate(); err != nil {
+		Error(err, "error running the generator")
+	}
 	data, err = gen.Marshal()
 	if err != nil {
 		Error(err, "error encountered marshaling response")
