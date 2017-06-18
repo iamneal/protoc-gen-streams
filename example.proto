@@ -1,0 +1,23 @@
+syntax="proto3";
+
+package local_streams;
+
+option go_package = "github.com/iamneal/local_streams;main";
+
+import "google/protobuf/timestamp.proto";
+
+message TestM {
+	string id = 1;
+}
+
+message WithTime {
+	google.protobuf.Timestamp time = 1;
+	int64 num = 2;
+}
+
+
+service Tserv {
+	rpc ServerStreamTestM(TestM) returns (stream TestM){};
+	rpc ServerStreamWithTime(WithTime) returns (stream TestM){};
+	rpc ServerStreamTimestamp(google.protobuf.Timestamp) returns (stream google.protobuf.Timestamp){};
+}
