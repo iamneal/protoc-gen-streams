@@ -8,6 +8,7 @@ import (
 
 func main() {
 	gen := Generator{}
+
 	data, err := ioutil.ReadAll(os.Stdin)
 	if err != nil {
 		Error(err, "error reading from Stdin")

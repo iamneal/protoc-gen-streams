@@ -1,0 +1,5 @@
+**/*~
+**/#*#
+**/*.pb.go
+./protoc-gen-streams
+**/*.pb.streams.go
