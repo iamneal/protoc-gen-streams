@@ -10,7 +10,7 @@ import (
 type Generator struct {
 	Req   plugin.CodeGeneratorRequest
 	Res   plugin.CodeGeneratorResponse
-	Files []*File
+	Files map[string]*File
 }
 
 func (g *Generator) Unmarshal(data []byte) error {
@@ -28,11 +28,11 @@ func (g *Generator) Generate() error {
 	return g.FillTemplates()
 }
 
-func (g *Generator) LocateMessageFile(name string) (*gpb.FileDescriptorProto, *gpb.DescriptorProto) {
+func (g *Generator) LocateMessageFile(name string) (*gpb.DescriptorProto, *gpb.FileDescriptorProto) {
 	for _, file := range g.Req.ProtoFile {
 		for _, msg := range file.MessageType {
 			if msg.GetName() == name {
-				return file, msg
+				return msg, file
 			}
 		}
 	}
@@ -40,7 +40,38 @@ func (g *Generator) LocateMessageFile(name string) (*gpb.FileDescriptorProto, *g
 }
 
 func (g *Generator) Parse() error {
-
+	for _, file := range g.Req.ProtoFile {
+		g.Files[file.GetName()] = &File{
+			Imports: make(map[string]string),
+			Streams: make([]*Stream, 0),
+			Pkg:     file.GetPackage(),
+		}
+		for _, service := range file.Service {
+			for _, method := range service.Method {
+				// this is a streaming method, add it to the current file
+				if method.GetClientStreaming() || method.GetServerStreaming() {
+					inM, inF := g.LocateMessageFile(method.GetInputType())
+					outM, outF := g.LocateMessageFile(method.GetOutputType())
+					stream := &Stream{
+						Input:      inM,
+						InputFile:  inF,
+						Output:     outM,
+						OutputFile: outF,
+						Method:     method,
+						File:       file,
+					}
+					n := file.GetName()
+					g.Files[n].Streams = append(g.Files[n].Streams, stream)
+				}
+			}
+		}
+	}
+	//remove all files that do not have stream implementations
+	for key, file := range g.Files {
+		if len(file.Streams) == 0 {
+			g.Files[key] = nil
+		}
+	}
 	return nil
 }
 
@@ -58,11 +89,14 @@ type File struct {
 // write a stream implementation.  Assumes
 // it is a stream type, and not unary
 type Stream struct {
-	Input     *gpb.DescriptorProto
-	Output    *gpb.DescriptorProto
-	Method    *gpb.MethodDescriptorProto
-	InputPkg  string
-	OutputPkg string
+	Input      *gpb.DescriptorProto
+	InputFile  *gpb.FileDescriptorProto
+	Output     *gpb.DescriptorProto
+	OutputFile *gpb.FileDescriptorProto
+	Method     *gpb.MethodDescriptorProto
+	File       *gpb.FileDescriptorProto
+	InputPkg   string
+	OutputPkg  string
 }
 
 // returns the name of the type that implements
