@@ -116,12 +116,13 @@ type Stream struct {
 // returns the name of the type that implements
 // the streaming interface.
 func (s *Stream) GetStreamImplName() string {
-	return fmt.Sprintf("%sing%s%s_%s%sImpl",
+	return fmt.Sprintf("%sing%s%s_%s%sImpl  %#v",
 		s.GetStreamingType(),
 		s.InputFile.GetPackage(),
 		s.Input.GetName(),
 		s.OutputFile.GetPackage(),
 		s.Output.GetName(),
+		s,
 	)
 }
 

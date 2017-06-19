@@ -1,6 +1,6 @@
 syntax="proto3";
 
-package local_streams;
+package main;
 
 option go_package = "github.com/iamneal/local_streams;main";
 

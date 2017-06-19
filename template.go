@@ -10,7 +10,7 @@ import (
 var streamTemplate = `
 package {{.Pkg}}
 
-import ({{range $key, val := .Imports}}
+import ({{range $key, $val := .Imports}}
 $val "$key"{{end}}
 )
 

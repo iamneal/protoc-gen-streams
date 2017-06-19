@@ -1,4 +1,4 @@
-all: generate build
+all: build generate
 
 build:
 	go build -o ./protoc-gen-streams .
