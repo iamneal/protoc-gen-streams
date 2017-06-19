@@ -4,6 +4,6 @@ build:
 	go build -o ./protoc-gen-streams .
 
 generate:
-	echo $$GOPATH
+	ls
 	protoc -I. -I/usr/local/include -I$$GOPATH/src --go_out=$$GOPATH/src --plugin=$$GOPATH/bin/protoc-gen-go ./*.proto 
-	protoc -I. -I/usr/local/include -I$$GOPATH/src --streams_out=$$GOPATH/src --plugin=./protoc-gen-streams:. ./*.proto
+	protoc -I. -I/usr/local/include -I$$GOPATH/src --streams_out=. --plugin=./protoc-gen-streams ./*.proto
