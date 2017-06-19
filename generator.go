@@ -18,6 +18,20 @@ func (g *Generator) Unmarshal(data []byte) error {
 }
 
 func (g *Generator) Marshal() ([]byte, error) {
+	for _, file := range g.Files {
+		if file != nil {
+			bytes, err := GetTemplateBytes(file)
+			if err != nil {
+				return nil, fmt.Errorf("error getting bytes from template: %s", err)
+			}
+			name := file.File.GetName() + ".stream.go"
+			content := string(bytes)
+			g.Res.File = append(g.Res.File, &plugin.CodeGeneratorResponse_File{
+				Name:    &name,
+				Content: &content,
+			})
+		}
+	}
 	return proto.Marshal(&g.Res)
 }
 
@@ -25,7 +39,7 @@ func (g *Generator) Generate() error {
 	if err := g.Parse(); err != nil {
 		return fmt.Errorf("error parsing request: %s", err)
 	}
-	return g.FillTemplates()
+	return nil
 }
 
 func (g *Generator) LocateMessageFile(name string) (*gpb.DescriptorProto, *gpb.FileDescriptorProto) {
@@ -45,6 +59,7 @@ func (g *Generator) Parse() error {
 			Imports: make(map[string]string),
 			Streams: make([]*Stream, 0),
 			Pkg:     file.GetPackage(),
+			File:    file,
 		}
 		for _, service := range file.Service {
 			for _, method := range service.Method {
@@ -76,6 +91,7 @@ func (g *Generator) Parse() error {
 }
 
 func (g *Generator) FillTemplates() error {
+
 	return nil
 }
 
@@ -83,6 +99,7 @@ type File struct {
 	Imports map[string]string // key being the package string, val being the name
 	Streams []*Stream
 	Pkg     string
+	File    *gpb.FileDescriptorProto
 }
 
 // a collection of the structs needed to
