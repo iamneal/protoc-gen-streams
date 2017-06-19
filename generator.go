@@ -95,8 +95,6 @@ type Stream struct {
 	OutputFile *gpb.FileDescriptorProto
 	Method     *gpb.MethodDescriptorProto
 	File       *gpb.FileDescriptorProto
-	InputPkg   string
-	OutputPkg  string
 }
 
 // returns the name of the type that implements
@@ -104,9 +102,9 @@ type Stream struct {
 func (s *Stream) GetStreamImplName() string {
 	return fmt.Sprintf("%sing%s%s_%s%sImpl",
 		s.GetStreamingType(),
-		s.InputPkg,
+		s.InputFile.GetPackage(),
 		s.Input.GetName(),
-		s.OutputPkg,
+		s.OutputFile.GetPackage(),
 		s.Output.GetName(),
 	)
 }
