@@ -13,6 +13,10 @@ type Generator struct {
 	Files map[string]*File
 }
 
+func NewGenerator() *Generator {
+	return &Generator{Files: make(map[string]*File)}
+}
+
 func (g *Generator) Unmarshal(data []byte) error {
 	return proto.Unmarshal(data, &g.Req)
 }

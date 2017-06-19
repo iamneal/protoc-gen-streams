@@ -7,7 +7,7 @@ import (
 )
 
 func main() {
-	gen := Generator{}
+	gen := NewGenerator()
 
 	data, err := ioutil.ReadAll(os.Stdin)
 	if err != nil {
