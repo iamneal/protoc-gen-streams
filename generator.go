@@ -28,7 +28,19 @@ func (g *Generator) Generate() error {
 	return g.FillTemplates()
 }
 
+func (g *Generator) LocateMessageFile(name string) (*gpb.FileDescriptorProto, *gpb.DescriptorProto) {
+	for _, file := range g.Req.ProtoFile {
+		for _, msg := range file.MessageType {
+			if msg.GetName() == name {
+				return file, msg
+			}
+		}
+	}
+	return nil, nil
+}
+
 func (g *Generator) Parse() error {
+
 	return nil
 }
 
@@ -37,8 +49,9 @@ func (g *Generator) FillTemplates() error {
 }
 
 type File struct {
-	Imports map[string]string
+	Imports map[string]string // key being the package string, val being the name
 	Streams []*Stream
+	Pkg     string
 }
 
 // a collection of the structs needed to
