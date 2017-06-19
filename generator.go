@@ -90,11 +90,6 @@ func (g *Generator) Parse() error {
 	return nil
 }
 
-func (g *Generator) FillTemplates() error {
-
-	return nil
-}
-
 type File struct {
 	Imports map[string]string // key being the package string, val being the name
 	Streams []*Stream
