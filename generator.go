@@ -6,6 +6,7 @@ import (
 	gpb "github.com/golang/protobuf/protoc-gen-go/descriptor"
 	plugin "github.com/golang/protobuf/protoc-gen-go/plugin"
 	"log"
+	"strings"
 )
 
 type Generator struct {
@@ -118,11 +119,20 @@ type Stream struct {
 // returns the name of the type that implements
 // the streaming interface.
 func (s *Stream) GetStreamImplName() string {
+	// converts packages like  ".google.protobuf" to "GoogleProtobuf"
+	convPackage := func(str string) string {
+		var newStr string
+		for _, s := range strings.Split(str, ".") {
+			newStr += strings.ToUpper(string(s[0])) + s[1:]
+		}
+		return newStr
+	}
+
 	return fmt.Sprintf("%sing%s%s_%s%sImpl",
 		s.GetStreamingType(),
-		s.InputFile.GetPackage(),
+		convPackage(s.InputFile.GetPackage()),
 		s.Input.GetName(),
-		s.OutputFile.GetPackage(),
+		convPackage(s.OutputFile.GetPackage()),
 		s.Output.GetName(),
 	)
 }
