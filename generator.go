@@ -5,6 +5,7 @@ import (
 	"github.com/golang/protobuf/proto"
 	gpb "github.com/golang/protobuf/protoc-gen-go/descriptor"
 	plugin "github.com/golang/protobuf/protoc-gen-go/plugin"
+	"log"
 )
 
 type Generator struct {
@@ -49,11 +50,12 @@ func (g *Generator) Generate() error {
 func (g *Generator) LocateMessageFile(name string) (*gpb.DescriptorProto, *gpb.FileDescriptorProto) {
 	for _, file := range g.Req.ProtoFile {
 		for _, msg := range file.MessageType {
-			if msg.GetName() == name {
+			if fmt.Sprintf(".%s.%s", file.GetPackage(), msg.GetName()) == name {
 				return msg, file
 			}
 		}
 	}
+	log.Print("could not find a: ", name)
 	return nil, nil
 }
 
@@ -116,13 +118,12 @@ type Stream struct {
 // returns the name of the type that implements
 // the streaming interface.
 func (s *Stream) GetStreamImplName() string {
-	return fmt.Sprintf("%sing%s%s_%s%sImpl  %#v",
+	return fmt.Sprintf("%sing%s%s_%s%sImpl",
 		s.GetStreamingType(),
 		s.InputFile.GetPackage(),
 		s.Input.GetName(),
 		s.OutputFile.GetPackage(),
 		s.Output.GetName(),
-		s,
 	)
 }
 
