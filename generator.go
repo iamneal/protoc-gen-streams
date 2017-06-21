@@ -6,6 +6,7 @@ import (
 	gpb "github.com/golang/protobuf/protoc-gen-go/descriptor"
 	plugin "github.com/golang/protobuf/protoc-gen-go/plugin"
 	"log"
+	"path"
 	"strings"
 )
 
@@ -30,7 +31,9 @@ func (g *Generator) Marshal() ([]byte, error) {
 			if err != nil {
 				return nil, fmt.Errorf("error getting bytes from template: %s", err)
 			}
-			name := file.File.GetName() + ".stream.go"
+			name := file.File.GetName()
+			ext := path.Ext(name)
+			name = name[:strings.LastIndex(name, ext)] + ".streams.go"
 			content := string(bytes)
 			g.Res.File = append(g.Res.File, &plugin.CodeGeneratorResponse_File{
 				Name:    &name,
